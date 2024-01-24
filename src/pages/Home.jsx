@@ -39,6 +39,7 @@ const Home = () => {
     }
   }, [diaryList, curDate]);
 
+  // ?? 다시 확인해보기
   useEffect(() => {
     console.log(data);
   }, [data]);
