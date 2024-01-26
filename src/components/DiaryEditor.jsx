@@ -16,7 +16,7 @@ import { emotionList } from "../util/emotion.jsx";
 
 const DiaryEditor = ({ isEdit, originData }) => {
   // dispatch 데이터 불러오기 (Oncreate)
-  const { onCreate, onEdit } = useContext(DiaryDispatchContext);
+  const { onCreate, onEdit, onRemove } = useContext(DiaryDispatchContext);
 
   const navigate = useNavigate();
 
@@ -58,6 +58,15 @@ const DiaryEditor = ({ isEdit, originData }) => {
     navigate("/", { replace: true });
   };
 
+  // 삭제하기
+
+  const handelRemove = () => {
+    if (window.confirm("정말 삭제하시겠습니까?")) {
+      onRemove(originData.id);
+      navigate("/", { replace: true });
+    }
+  };
+
   // 수정하기 부분 데이터 그대로 넘겨주기 | IsEdit과 orgindata값이 바뀔때
   useEffect(() => {
     if (isEdit) {
@@ -73,6 +82,15 @@ const DiaryEditor = ({ isEdit, originData }) => {
         headText={isEdit ? "일기 수정하기" : "새 일기쓰기"}
         leftChild={
           <MyButton text={"< 뒤로가기"} onClick={() => navigate(-1)} />
+        }
+        rightChild={
+          isEdit && (
+            <MyButton
+              text={"삭제하기"}
+              type={"negative"}
+              onClick={handelRemove}
+            />
+          )
         }
       />
       <div>
