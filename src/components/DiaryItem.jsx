@@ -1,3 +1,4 @@
+import React from "react";
 import styled from "styled-components";
 import MyButton from "./MyButton";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +34,7 @@ const DiaryItem = ({ id, emotion, content, date }) => {
   );
 };
 
-export default DiaryItem;
+export default React.memo(DiaryItem);
 
 const DiaryItemWrapper = styled.div`
   padding-top: 15px;

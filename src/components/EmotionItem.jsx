@@ -1,7 +1,7 @@
 /**
  * 감정 | DiaryEditor(new&edit)
  */
-
+import React from "react";
 import styled from "styled-components";
 
 const EmotionItem = ({
@@ -25,7 +25,7 @@ const EmotionItem = ({
   );
 };
 
-export default EmotionItem;
+export default React.memo(EmotionItem);
 
 const EmotionItemWrapper = styled.div`
   cursor: pointer;

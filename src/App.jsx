@@ -52,18 +52,20 @@ function App() {
   const [data, dispatch] = useReducer(reducer, []);
 
   // local스토리지에 있는 값을 기초값으로 만들기
-
   useEffect(() => {
     const localData = localStorage.getItem("diary");
     if (localData) {
       const diaryList = JSON.parse(localData).sort(
         (a, b) => parseInt(b.id) - parseInt(a.id)
       );
-      dataId.current = parseInt(diaryList[0].id + 1);
-
-      dispatch({ type: "INIT", data: diaryList });
+      // dataId.current = parseInt(diaryList[0].id + 1);
+      // dispatch({ type: "INIT", data: diaryList });
+      if (diaryList && diaryList.length > 0) {
+        dataId.current = parseInt(diaryList[0].id + 1);
+        dispatch({ type: "INIT", data: diaryList });
+      }
     }
-  });
+  }, []);
 
   const dataId = useRef(6);
   // CREATE
