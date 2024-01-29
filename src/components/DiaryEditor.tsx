@@ -2,7 +2,13 @@
  * New, Edit 페이지 공통 컴포넌트
  */
 
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
@@ -11,12 +17,22 @@ import MyHeader from "./MyHeader";
 import EmotionItem from "./EmotionItem";
 import { DiaryDispatchContext } from "../App";
 
-import { getStringDate } from "../util/date.jsx";
-import { emotionList } from "../util/emotion.jsx";
+import { getStringDate } from "../util/date";
+import { emotionList } from "../util/emotion";
+import { DiaryItem } from "../../types";
 
-const DiaryEditor = ({ isEdit, originData }) => {
-  // dispatch 데이터 불러오기 (Oncreate)
-  const { onCreate, onEdit, onRemove } = useContext(DiaryDispatchContext);
+interface DiaryEditorProps {
+  isEdit: boolean;
+  originData: DiaryItem | null;
+}
+
+const DiaryEditor: React.FC<DiaryEditorProps> = ({ isEdit, originData }) => {
+  // dispatch 데이터 불러오기
+  const diaryDispatch = useContext(DiaryDispatchContext);
+  if (!diaryDispatch) {
+    throw new Error("cannot find DiaryDispatchProvider");
+  }
+  const { onCreate, onEdit, onRemove } = diaryDispatch;
 
   const navigate = useNavigate();
 
@@ -27,12 +43,12 @@ const DiaryEditor = ({ isEdit, originData }) => {
   const [date, setDate] = useState(getStringDate(new Date()));
 
   // 감정 클릭시 변경
-  const handleClickEmote = useCallback((emotion) => {
+  const handleClickEmote = useCallback((emotion: number) => {
     setEmotion(emotion);
   }, []);
 
   // 포커싱
-  const contentRef = useRef();
+  const contentRef = useRef<HTMLTextAreaElement>(null);
 
   // 일기 입력값 저장하기
   const [content, setContent] = useState("");
@@ -40,7 +56,9 @@ const DiaryEditor = ({ isEdit, originData }) => {
   // 작성완료 버튼 기능
   const handleSubmit = () => {
     if (content.length < 1) {
-      contentRef.current.focus();
+      if (contentRef.current) {
+        contentRef.current.focus();
+      }
       return;
     }
 
@@ -50,9 +68,13 @@ const DiaryEditor = ({ isEdit, originData }) => {
       )
     ) {
       if (!isEdit) {
-        onCreate(date, content, emotion);
+        if (onCreate) {
+          onCreate(date, content, emotion);
+        }
       } else {
-        onEdit(originData.id, date, content, emotion);
+        if (onEdit && originData) {
+          onEdit(originData.id, date, content, emotion);
+        }
       }
     }
 
@@ -63,15 +85,17 @@ const DiaryEditor = ({ isEdit, originData }) => {
 
   const handelRemove = () => {
     if (window.confirm("정말 삭제하시겠습니까?")) {
-      onRemove(originData.id);
+      if (onRemove && originData) {
+        onRemove(originData.id);
+      }
       navigate("/", { replace: true });
     }
   };
 
   // 수정하기 부분 데이터 그대로 넘겨주기 | IsEdit과 orgindata값이 바뀔때
   useEffect(() => {
-    if (isEdit) {
-      setDate(getStringDate(new Date(parseInt(originData.date))));
+    if (isEdit && originData) {
+      setDate(getStringDate(new Date(originData.date)));
       setEmotion(originData.emotion);
       setContent(originData.content);
     }
@@ -82,16 +106,20 @@ const DiaryEditor = ({ isEdit, originData }) => {
       <MyHeader
         headText={isEdit ? "일기 수정하기" : "새 일기쓰기"}
         leftChild={
-          <MyButton text={"< 뒤로가기"} onClick={() => navigate(-1)} />
+          <MyButton
+            type={"default"}
+            text={"< 뒤로가기"}
+            onClick={() => navigate(-1)}
+          />
         }
         rightChild={
-          isEdit && (
+          isEdit ? (
             <MyButton
               text={"삭제하기"}
               type={"negative"}
               onClick={handelRemove}
             />
-          )
+          ) : null
         }
       />
       <div>
@@ -132,7 +160,11 @@ const DiaryEditor = ({ isEdit, originData }) => {
         </section>
         <section>
           <ControlBox className="control-box">
-            <MyButton text={"취소하기"} onClick={() => navigate(-1)} />
+            <MyButton
+              type={"default"}
+              text={"취소하기"}
+              onClick={() => navigate(-1)}
+            />
             <MyButton
               text={"작성완료"}
               type={"positive"}

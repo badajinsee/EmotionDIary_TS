@@ -8,9 +8,17 @@ import New from "./pages/New";
 import Edit from "./pages/Edit";
 import Diary from "./pages/Diary";
 
-// reducer 구현
+import { DiaryItem } from "../types";
 
-const reducer = (state, action) => {
+// Action 타입정의
+type Action =
+  | { type: "INIT"; data: DiaryItem[] }
+  | { type: "CREATE"; data: DiaryItem }
+  | { type: "REMOVE"; targetId: number }
+  | { type: "EDIT"; data: DiaryItem };
+
+// reducer 구현
+const reducer = (state: DiaryItem[], action: Action): DiaryItem[] => {
   let newState = [];
   switch (action.type) {
     // "INIT" 액션이 들어왔을 때, action.data 값을 바로 반환하여 상태를 초기화
@@ -44,9 +52,18 @@ const reducer = (state, action) => {
 };
 
 // data state 컴포넌트 트리 전역에 공급
-export const DiaryStateContext = React.createContext();
+export const DiaryStateContext = React.createContext<DiaryItem[] | null>(null);
 // dispatch 함수 공급
-export const DiaryDispatchContext = React.createContext();
+export const DiaryDispatchContext = React.createContext<{
+  onCreate?: (date: string, content: string, emotion: number) => void;
+  onRemove?: (targetId: number) => void;
+  onEdit?: (
+    targetId: number,
+    date: string,
+    content: string,
+    emotion: number
+  ) => void;
+} | null>(null);
 
 function App() {
   const [data, dispatch] = useReducer(reducer, []);
@@ -56,20 +73,21 @@ function App() {
     const localData = localStorage.getItem("diary");
     if (localData) {
       const diaryList = JSON.parse(localData).sort(
-        (a, b) => parseInt(b.id) - parseInt(a.id)
+        (diaryB: DiaryItem, diaryA: DiaryItem) => diaryB.id - diaryA.id
       );
-      // dataId.current = parseInt(diaryList[0].id + 1);
-      // dispatch({ type: "INIT", data: diaryList });
       if (diaryList && diaryList.length > 0) {
-        dataId.current = parseInt(diaryList[0].id + 1);
+        dataId.current = diaryList[0].id + 1;
         dispatch({ type: "INIT", data: diaryList });
       }
     }
   }, []);
 
   const dataId = useRef(6);
+
   // CREATE
-  const onCreate = (date, content, emotion) => {
+  const onCreate = (date: string, content: string, emotion: number) => {
+    const lastId = localStorage.getItem("lastId");
+    const newId = lastId ? Number(lastId) + 1 : 1;
     dispatch({
       type: "CREATE",
       data: {
@@ -79,15 +97,20 @@ function App() {
         emotion,
       },
     });
-    dataId.current += 1;
+    localStorage.setItem("lastId", String(newId));
     // CREATE 액션을 통해 새로운 데이터가 생성될 때마다 dataId.current 값을 증가 이를 통해 각 데이터는 고유한 id 값을 가지게 됨
   };
   // REMOVE
-  const onRemove = (targetId) => {
+  const onRemove = (targetId: number) => {
     dispatch({ type: "REMOVE", targetId });
   };
   // EDIT
-  const onEdit = (targetId, date, content, emotion) => {
+  const onEdit = (
+    targetId: number,
+    date: string,
+    content: string,
+    emotion: number
+  ) => {
     dispatch({
       type: "EDIT",
       data: {

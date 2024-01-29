@@ -5,10 +5,12 @@ import { DiaryStateContext } from "../App";
 import MyHeader from "../components/MyHeader";
 import MyButton from "../components/MyButton";
 
-import { getStringDate } from "../util/date.jsx";
-import { emotionList } from "../util/emotion.jsx";
+import { getStringDate } from "../util/date";
+import { emotionList } from "../util/emotion";
 
 import styled from "styled-components";
+
+import { DiaryItem } from "../../types";
 
 const Diary = () => {
   // 전달 받은 패스 베리어블들을 모아서 객체로 가져다 줌
@@ -20,13 +22,19 @@ const Diary = () => {
   const navigate = useNavigate();
 
   // 일치하는 데이터 저장 state
-  const [data, setData] = useState();
+  const [data, setData] = useState<DiaryItem | undefined>(undefined);
+
+  // 타이틀 바꾸기
+  useEffect(() => {
+    const titleElement = document.getElementsByTagName("title")[0];
+    titleElement.innerHTML = `감정일기장 - ${id}번 일기`;
+  }, []);
 
   // id와 diarylist가 변경될때 수행
   useEffect(() => {
-    if (diaryList.length >= 1) {
+    if (diaryList && diaryList.length >= 1) {
       const targetDiary = diaryList.find(
-        (it) => parseInt(it.id) === parseInt(id)
+        (it) => it.id === (id ? parseInt(id) : undefined)
       );
       if (targetDiary) {
         // 일기가 존재할 때
@@ -44,7 +52,7 @@ const Diary = () => {
   } else {
     // 감정 일치 확인
     const curEmotionData = emotionList.find(
-      (it) => parseInt(it.emotion_id) === parseInt(data.emotion)
+      (it) => it.emotion_id === data.emotion
     );
 
     return (
@@ -52,10 +60,15 @@ const Diary = () => {
         <MyHeader
           headText={`${getStringDate(new Date(data.date))}의 기록`}
           leftChild={
-            <MyButton text={"< 뒤로가기"} onClick={() => navigate(-1)} />
+            <MyButton
+              type={"default"}
+              text={"< 뒤로가기"}
+              onClick={() => navigate(-1)}
+            />
           }
           rightChild={
             <MyButton
+              type={"default"}
               text={"수정하기"}
               onClick={() => navigate(`/edit/${data.id}`)}
             />
@@ -70,10 +83,14 @@ const Diary = () => {
                 `diary_img_wrapper_${data.emotion}`,
               ].join(" ")}
             >
-              <img src={curEmotionData.emotion_img} alt="emotionimg" />
-              <EmotionDescript className="emotion-descript">
-                {curEmotionData.emotion_descript}
-              </EmotionDescript>
+              {curEmotionData && (
+                <img src={curEmotionData.emotion_img} alt="emotionimg" />
+              )}
+              {curEmotionData && (
+                <EmotionDescript className="emotion-descript">
+                  {curEmotionData.emotion_descript}
+                </EmotionDescript>
+              )}
             </DiaryImgWrapper>
           </DiarySection>
           <DiaryContentSection>

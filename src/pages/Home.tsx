@@ -5,12 +5,16 @@ import MyButton from "../components/MyButton";
 
 import { DiaryStateContext } from "../App";
 import DiaryList from "../components/DiaryList";
+import { DiaryItem } from "../../types";
 
 const Home = () => {
   const diaryList = useContext(DiaryStateContext);
+  if (!diaryList) {
+    throw new Error("cannot find DiaryStateContext");
+  }
 
   // 날짜에 따라 데이터가 다르게
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<DiaryItem[]>([]);
 
   // 날짜 저장
   const [curDate, setCurDate] = useState(new Date());
@@ -42,31 +46,26 @@ const Home = () => {
     }
   }, [diaryList, curDate]);
 
-  // ?? 다시 확인해보기
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
   // +1 미래 달
   const increaseMonth = () => {
-    setCurDate(
-      new Date(curDate.getFullYear(), curDate.getMonth() + 1, curDate.getDate())
-    );
+    setCurDate(new Date(curDate.getFullYear(), curDate.getMonth() + 1, 1));
   };
 
   // -1 과거 달
   const decreaseMonth = () => {
-    setCurDate(
-      new Date(curDate.getFullYear(), curDate.getMonth() - 1, curDate.getDate())
-    );
+    setCurDate(new Date(curDate.getFullYear(), curDate.getMonth() - 1, 1));
   };
 
   return (
     <div>
       <MyHeader
         headText={headText}
-        leftChild={<MyButton text={"<"} onClick={decreaseMonth} />}
-        rightChild={<MyButton text={">"} onClick={increaseMonth} />}
+        leftChild={
+          <MyButton type={"default"} text={"<"} onClick={decreaseMonth} />
+        }
+        rightChild={
+          <MyButton type={"default"} text={">"} onClick={increaseMonth} />
+        }
       />
       <DiaryList diaryList={data} />
     </div>

@@ -1,4 +1,10 @@
-const MyButton = ({ text, type, onClick }) => {
+interface MyButtonProps {
+  text: string;
+  type: string;
+  onClick: () => void;
+}
+
+const MyButton: React.FC<MyButtonProps> = ({ text, type, onClick }) => {
   //btn 타입 적용 , positive, negative가 아닐시 dafault 타입으로 반환
   const btnType = ["positive", "negative"].includes(type) ? type : "default";
   return (

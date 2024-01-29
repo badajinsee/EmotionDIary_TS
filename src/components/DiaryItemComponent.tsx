@@ -1,10 +1,14 @@
+// 일기 상세페이지
 import React from "react";
 import styled from "styled-components";
 import MyButton from "./MyButton";
 import { useNavigate } from "react-router-dom";
-const DiaryItem = ({ id, emotion, content, date }) => {
+
+import { DiaryItem } from "../../types";
+
+const DiaryItemComponent = ({ id, emotion, content, date }: DiaryItem) => {
   // 날짜 사람이 보기 편하게 바꾸기
-  const strDate = new Date(parseInt(date)).toLocaleDateString();
+  const strDate = new Date(date).toLocaleDateString();
 
   const navigate = useNavigate();
 
@@ -28,13 +32,17 @@ const DiaryItem = ({ id, emotion, content, date }) => {
         <DiaryContent>{content.slice(0, 25)}</DiaryContent>
       </InfoWrapper>
       <BtnWrapper className="btn_wrapper">
-        <MyButton text={"수정하기"} onClick={() => navigate(`edit/${id}`)} />
+        <MyButton
+          type={"default"}
+          text={"수정하기"}
+          onClick={() => navigate(`edit/${id}`)}
+        />
       </BtnWrapper>
     </DiaryItemWrapper>
   );
 };
 
-export default React.memo(DiaryItem);
+export default React.memo(DiaryItemComponent);
 
 const DiaryItemWrapper = styled.div`
   padding-top: 15px;

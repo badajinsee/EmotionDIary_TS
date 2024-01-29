@@ -4,7 +4,15 @@
 import React from "react";
 import styled from "styled-components";
 
-const EmotionItem = ({
+interface EmotionItemProps {
+  emotion_id: number;
+  emotion_img: string;
+  emotion_descript: string;
+  onClick: (id: number) => void;
+  isSelected: boolean;
+}
+
+const EmotionItem: React.FC<EmotionItemProps> = ({
   emotion_id,
   emotion_img,
   emotion_descript,
