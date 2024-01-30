@@ -10,7 +10,7 @@
 
 ### 사이트
 
-[ ➡️ 감정일기 사이트 접속하기 ](https:/sunjin-react-project.web.app/)
+[ 감정일기 사이트 접속하기 ](https://sunjin-react-project.web.app/)
 
 ---
 
