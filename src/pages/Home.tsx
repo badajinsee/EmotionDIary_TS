@@ -22,6 +22,12 @@ const Home = () => {
   // 헤드텍스트
   const headText = `${curDate.getFullYear()}년 ${curDate.getMonth() + 1}월`;
 
+  // 타이틀 바꾸기
+  useEffect(() => {
+    const titleElement = document.getElementsByTagName("title")[0];
+    titleElement.innerHTML = `감정일기장`;
+  }, []);
+
   // 날짜에 따라 데이터 다르게 추리기 && 달의 첫날과 끝날로
   useEffect(() => {
     if (diaryList.length >= 1) {
